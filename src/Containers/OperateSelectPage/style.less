@@ -1,0 +1,50 @@
+#operateSelectPage{
+  background-color: rgb(240,242,245);
+  .ant-menu{
+    background-color: inherit;
+    color: white;
+  }
+  .ant-menu-horizontal{
+    border: none;
+  }
+  .ant-menu-item, .ant-menu-submenu-title{
+    padding: 7px 20px;
+  }
+  .ant-menu-item-selected{
+    color: white;
+  }
+  .ant-row{
+    margin-top: 30px;
+  }
+  .ant-layout-footer{
+    background-color: #001529;
+    color: white;
+  }
+  .pie-container{
+    width: 982px;
+    margin: 0 auto;
+    #operateSelectBox{
+      float: left;
+      margin: 10px 32px;
+    }
+  }
+  @media screen and (max-width: 960px){
+    .pie-container{
+      width: 544px;
+      #operateSelectBox{
+        margin: 10px 10px;
+      }
+    }
+  }
+  @media screen and (max-width: 630px){
+    .pie-container{
+      width: 270px;
+      #operateSelectBox{
+        margin: 10px 10px;
+      }
+    }
+  }
+  .ant-layout-content{
+    min-height: calc(100vh - 68px);;
+  }
+}
