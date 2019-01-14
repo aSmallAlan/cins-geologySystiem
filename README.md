@@ -1,4 +1,4 @@
-# cins-geogogySystem
+# 岩石薄片智能标注系统
 
 基于react+redux+antd+echarts
 
