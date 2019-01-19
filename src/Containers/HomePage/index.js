@@ -1,10 +1,12 @@
 import React from 'react'
 import { Menu, Layout, Carousel, Button } from 'antd';
 import firstImgUrl from '../../Static/image/homePageBanner1.jpg';
-import secondImgUrl from '../../Static/image/homePageBanner2.jpg'
+import secondImgUrl from '../../Static/image/homePageBanner2.jpg';
+import thirdImgUrl from '../../Static/image/homePageBanner3.jpg';
+import fourthImgUrl from '../../Static/image/homePageBanner4.jpg'
 import './style.less'
 
-const {Header, Content, Footer} = Layout;
+const {Header, Content} = Layout;
 
 
 class HomePage extends React.Component{
@@ -22,8 +24,6 @@ class HomePage extends React.Component{
     componentDidMount(){
         //填满整个屏幕
         let screenHeight = document.querySelector('body').offsetHeight;
-        let node = document.getElementsByClassName("slick-list");
-        console.log(node)
         this.setState({
             screensHeight: screenHeight
         })
@@ -39,8 +39,12 @@ class HomePage extends React.Component{
         //切换轮播图
         if (key === 'SliceAnalyze'){
             this.refs.carousel.goTo(0)
-        }else{
+        }else if (key === 'NowAnalyze') {
             this.refs.carousel.goTo(1);
+        }else if (key === 'exchangeCooperation'){
+            this.refs.carousel.goTo(2);
+        }else if (key === 'introduction'){
+            this.refs.carousel.goTo(3);
         }
 
     }
@@ -65,6 +69,14 @@ class HomePage extends React.Component{
             this.setState({
                 current: 'NowAnalyze'
             })
+        } else if (current === 2){
+            this.setState({
+                current: 'exchangeCooperation'
+            })
+        } else if (current === 3){
+            this.setState({
+                current: 'introduction'
+            })
         }
     }
 
@@ -84,6 +96,12 @@ class HomePage extends React.Component{
                             </Menu.Item>
                             <Menu.Item key="NowAnalyze">
                                 现状分析
+                            </Menu.Item>
+                            <Menu.Item key="exchangeCooperation">
+                                交流合作
+                            </Menu.Item>
+                            <Menu.Item key="introduction">
+                                平台介绍
                             </Menu.Item>
                         </Menu>
                     </Header>
@@ -109,7 +127,7 @@ class HomePage extends React.Component{
                                             气层保护工作更好的进行。
                                         </p>
                                         <div>
-                                            <Button type="dashed" ghost onClick={()=>{this.props.history.push('/operateSelect') }}>进入</Button>
+                                            <Button type="dashed" ghost onClick={()=>{this.props.history.push('/searchData') }}>进入</Button>
                                         </div>
                                     </div>
                                 </div>
@@ -119,6 +137,46 @@ class HomePage extends React.Component{
                                 <div className='sliceButton-container'>
                                     <div className='inner-container'>
                                         <h1 style={{color: 'white'}}>现状分析</h1>
+                                        <p>
+                                            薄片分析技术是岩心分析最基础的分析技术, 需要
+                                            使用光学显微镜对薄片进行观察。薄片分析对制片
+                                            技术有一定要求,首先应使用铸体薄片, 其次制片厚度
+                                            为0.03mm , 最后制片面积应大于15mm x 15mm 。分
+                                            析内容主要包括制片分析、成岩变化分析、自生矿物分析
+                                            、孔隙特征分析等。薄片分析技术具有常规性、基础性和
+                                            不可替代性等特点。
+                                        </p>
+                                        <div>
+                                            <Button type="dashed" ghost>进入</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <img src={thirdImgUrl} alt="" style={{width: '100%', height: this.state.screensHeight-68, float: 'left'}}/>
+                                <div className='sliceButton-container'>
+                                    <div className='inner-container'>
+                                        <h1 style={{color: 'white'}}>交流合作</h1>
+                                        <p>
+                                            薄片分析技术是岩心分析最基础的分析技术, 需要
+                                            使用光学显微镜对薄片进行观察。薄片分析对制片
+                                            技术有一定要求,首先应使用铸体薄片, 其次制片厚度
+                                            为0.03mm , 最后制片面积应大于15mm x 15mm 。分
+                                            析内容主要包括制片分析、成岩变化分析、自生矿物分析
+                                            、孔隙特征分析等。薄片分析技术具有常规性、基础性和
+                                            不可替代性等特点。
+                                        </p>
+                                        <div>
+                                            <Button type="dashed" ghost>进入</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <img src={fourthImgUrl} alt="" style={{width: '100%', height: this.state.screensHeight-68, float: 'left'}}/>
+                                <div className='sliceButton-container'>
+                                    <div className='inner-container'>
+                                        <h1 style={{color: 'white'}}>平台介绍</h1>
                                         <p>
                                             薄片分析技术是岩心分析最基础的分析技术, 需要
                                             使用光学显微镜对薄片进行观察。薄片分析对制片

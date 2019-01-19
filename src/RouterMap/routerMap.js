@@ -1,9 +1,14 @@
 import React from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
-
+import { hashHistory } from 'react-router' ;
+import { Provider } from 'react-redux'
 import HomePage from '../Containers/HomePage'
-import OperateSelectPage from '../Containers/OperateSelectPage'
+import SliceListPage from '../Containers/SliceListPage'
+import AnalyzePage from '../Containers/AnalyzePage'
 import SearchDataPage from '../Containers/SearchDataPage'
+import configureStore from '../Store/configureStore';
+
+let store = configureStore();
 
 class RouterMap extends React.Component{
     constructor(props){
@@ -12,13 +17,16 @@ class RouterMap extends React.Component{
 
     render(){
         return (
-            <HashRouter>
-                <Switch>
-                    <Route exact path='/' component={HomePage} />
-                    <Route path='/operateSelect' component={OperateSelectPage}/>
-                    <Route path='/searchData' component={SearchDataPage} />
-                </Switch>
-            </HashRouter>
+            <Provider store={store}>
+                <HashRouter>
+                    <Switch>
+                        <Route exact path='/' component={HomePage} />
+                        <Route path='/searchData' component={SearchDataPage} />
+                        <Route path='/sliceList' component={SliceListPage}/>
+                        <Route path='/analyze' component={AnalyzePage}/>
+                    </Switch>
+                </HashRouter>
+            </Provider>
         )
     }
 }
