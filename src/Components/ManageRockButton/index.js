@@ -1,5 +1,8 @@
 import React from 'react'
-import { Button, Modal, Form, Input, Icon, Select, message, Upload, Cascader} from 'antd';
+import {  Modal, Form, Input, Icon, Select, Upload, Cascader, message} from 'antd';
+import {fetchUpdateRocks} from "../../Fetch/fetchSearchData";
+import {connect} from "react-redux";
+
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -23,15 +26,15 @@ const CollectionCreateForm = Form.create()(
         }
 
         componentDidMount(){
-            let imageSrc = this.props.allData.image;
-           this.setState({
-               fileList:[{
-                   uid: '-1',
-                   name: 'xxx.png',
-                   status: 'done',
-                   url: imageSrc,
-               }]
-           })
+            let imageSrc = this.props.message.detail.image;
+            this.setState({
+                fileList:[{
+                    uid: '-1',
+                    name: 'xxx.png',
+                    status: 'done',
+                    url: imageSrc,
+                }]
+            });
         }
 
         //----------上传图片-----------------
@@ -82,7 +85,7 @@ const CollectionCreateForm = Form.create()(
         render() {
             let allData = [];
             try{
-                allData = this.props.allData;
+                allData = this.props.message;
             }catch (e) {
                 return e
             }
@@ -96,13 +99,12 @@ const CollectionCreateForm = Form.create()(
                     <div className="ant-upload-text">Upload</div>
                 </div>
             );
-
-
-            const options = this.props.regionList;
+            const {poltypes, regions, lithos} = this.props;
             //只显示最后一层
             function displayRender(label) {
                 return label[label.length - 1];
             }
+
 
             return (
                 <Modal
@@ -117,7 +119,9 @@ const CollectionCreateForm = Form.create()(
                 >
                     <Form layout="vertical">
                         {/*图片*/}
-                        <FormItem>
+                        <FormItem
+                            label="图片"
+                        >
                             {getFieldDecorator('upload',{
                                 valuePropName: 'fileList',
                                 getValueFromEvent: this.normFile,
@@ -140,58 +144,120 @@ const CollectionCreateForm = Form.create()(
                                 </div>
                             )}
                         </FormItem>
+                        {/*颜色*/}
+                        <FormItem
+                            label="颜色"
+                        >
+                            {getFieldDecorator('color',{ initialValue: allData.detail.color},{
+                                rules: [{ required: true, message: '请输入颜色!' }],
+                            })(
+                                <Input prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入颜色" />
+                            )}
+                        </FormItem>
+                        {/*倍数*/}
+                        <FormItem
+                            label="倍数"
+                        >
+                            {getFieldDecorator('multiple',{ initialValue: allData.detail.multiple},{
+                                rules: [{ required: true, message: '请输入倍数!' }],
+                            })(
+                                <Input prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入倍数" />
+                            )}
+                        </FormItem>
+                        {/*年代地层单位*/}
+                        <FormItem
+                            label="年代地层单位"
+                        >
+                            {getFieldDecorator('area_detail',{ initialValue: allData.detail.area_detail},{
+                                rules: [{ required: true, message: '请选择年代地层单位!' }],
+                            })(
+                                <Cascader
+                                    options={regions}
+                                    placeholder="请选择年代地层单位"
+                                    displayRender={displayRender}
+                                    fieldNames={{
+                                        label: 'region',
+                                        value: 'id',
+                                        children: 'next_categery'
+                                    }}
+                                />,
+                            )}
+                        </FormItem>
                         {/*深度*/}
-                        <FormItem>
-                            {getFieldDecorator('depth', { initialValue: allData.depth},{
+                        <FormItem
+                            label="深度"
+                        >
+                            {getFieldDecorator('depth',{ initialValue: allData.depth},{
                                 rules: [{ required: true, message: '请输入深度!' }],
                             })(
                                 <Input prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入深度" />
                             )}
                         </FormItem>
                         {/*偏光类型*/}
-                        <FormItem>
-                            {getFieldDecorator('pol_type', { initialValue: allData.pol_type.id},{
+                        <FormItem
+                            label="偏光类型"
+                        >
+                            {getFieldDecorator('pol_type',{ initialValue: allData.detail.pol_type},{
                                 rules: [{ required: true, message: '请选择偏光类型！' }],
                             })(
                                 <Select
                                     placeholder="选择偏光类型"
                                 >
-
+                                    {
+                                        poltypes.map((item, index)=>{
+                                            return <Option value={item.id}>{item.pol_type}</Option>
+                                        })
+                                    }
                                 </Select>
                             )}
                         </FormItem>
                         {/*岩性*/}
-                        <FormItem>
-                            {getFieldDecorator('lit_des', { initialValue: allData.lit_des.id},{
+                        <FormItem
+                            label="岩性"
+                        >
+                            {getFieldDecorator('lit_des',{ initialValue: allData.detail.lit_des},{
                                 rules: [{ required: true, message: '请选择岩性！' }],
                             })(
                                 <Select
                                     placeholder="选择岩性"
                                 >
+                                    {
+                                        lithos.map((item, index)=>{
+                                            return <Option value={item.id}>{item.lit_des}</Option>
+                                        })
+                                    }
                                 </Select>
                             )}
                         </FormItem>
                         {/*组分特征*/}
-                        <FormItem>
-                            {getFieldDecorator('lit_com',{ initialValue: allData.lit_com})(
+                        <FormItem
+                            label="组分特征"
+                        >
+                            {getFieldDecorator('lit_com',{ initialValue: allData.detail.lit_com})(
                                 <TextArea prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入组分特征" />
                             )}
                         </FormItem>
-                        {/*古生物特征*/}
-                        <FormItem>
-                            {getFieldDecorator('pal_fea', { initialValue: allData.pal_fea})(
-                                <TextArea prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入古生物特征" />
-                            )}
-                        </FormItem>
                         {/*岩性特征*/}
-                        <FormItem>
-                            {getFieldDecorator('lit_fea',  { initialValue: allData.lit_fea})(
+                        <FormItem
+                            label="岩性特征"
+                        >
+                            {getFieldDecorator('lit_fea',{ initialValue: allData.detail.lit_fea})(
                                 <TextArea prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入岩性特征" />
                             )}
                         </FormItem>
+                        {/*古生物特征*/}
+                        <FormItem
+                            label="古生物特征"
+                        >
+                            {getFieldDecorator('pal_fea',{ initialValue: allData.detail.pal_fea})(
+                                <TextArea prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入古生物特征" />
+                            )}
+                        </FormItem>
                         {/*孔缝特征*/}
-                        <FormItem>
-                            {getFieldDecorator('por_fea',  { initialValue: allData.por_fea})(
+                        <FormItem
+                            label="孔缝特征"
+                        >
+                            {getFieldDecorator('por_fea',{ initialValue: allData.detail.por_fea})(
                                 <TextArea prefix={<Icon type="credit-card" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="请输入孔缝特征" />
                             )}
                         </FormItem>
@@ -224,24 +290,38 @@ class CollectionsPage extends React.Component {
     };
 
     showModal(){
-
-            this.setState({
-                visible: true
-            })
+        this.setState({
+            visible: true
+        })
     };
 
     handleCancel(){
         this.setState({ visible: false });
     };
 
-    //提交
+    //上传修改
     handleCreate(){
         const form = this.formRef.props.form;
         form.validateFields((err, values) => {
             if (err) {
                 return;
             }
+            let fileList = this.state.imgData;
+            let postData =  Object.assign(values,{ image: fileList, area_detail: values.area_detail[values.area_detail.length -1]})
 
+            let result = fetchUpdateRocks({id: this.props.message.detail.id},postData);
+            result.then(res=>{
+                return  res.json()
+            }).then(res=>{
+                    if (res.code == 0){
+                        message.info("修改成功！");
+                        this.props.update(this.props.currentPage);
+                        this.setState({ visible: false });
+                    }else{
+                        message.error(res.msg)
+                    }
+                }
+            );
             form.resetFields();
         });
     };
@@ -251,6 +331,7 @@ class CollectionsPage extends React.Component {
     };
 
     render() {
+        const {poltypes, regions, lithos} = this.props;
         return (
                 <a  onClick={this.showModal}>修改
                     {
@@ -258,18 +339,27 @@ class CollectionsPage extends React.Component {
                             <CollectionCreateForm
                                 wrappedComponentRef={this.saveFormRef}
                                 visible={this.state.visible}
+                                poltypes={poltypes.polData}
+                                regions={regions.regionData}
+                                lithos={lithos.litData}
                                 onCancel={this.handleCancel}
                                 onCreate={this.handleCreate}
                                 getImgData={this.getImgData}
-                                regionList={this.props.regionList}
-                                poltypeList={this.props.poltypeList}
-                                lithosList={this.props.lithosList}
-                                allData={this.state.allMessage}
+                                message={this.props.message}
                             />:null
                     }
                 </a>
-
         );
     }
 }
-export default CollectionsPage
+// 链接redux
+function mapStateToProps(state) {
+    return {
+        poltypes: state.poltypeData,
+        regions: state.regionData,
+        lithos: state.lithosData
+    }
+}
+export default connect(
+    mapStateToProps
+)(CollectionsPage)

@@ -22,7 +22,7 @@ class RouterMap extends React.Component{
                     <Switch>
                         <Route exact path='/' component={HomePage} />
                         <Route path='/searchData' component={SearchDataPage} />
-                        <Route path='/sliceList' component={SliceListPage}/>
+                        <Route path='/sliceList/:id' component={SliceListPage}/>
                         <Route path='/analyze' component={AnalyzePage}/>
                     </Switch>
                 </HashRouter>

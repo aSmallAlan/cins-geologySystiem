@@ -1,8 +1,11 @@
 import React from 'react'
 import { Layout, Menu, Col, Row, Form, Input, Button,Breadcrumb, Icon } from 'antd'
 import MapChooseChart from './MapChooseChart'
-import {getRocksByCondition} from "../../Fetch/fetchSearchData";
+import {fetchGetTouchMaps} from "../../Fetch/fetchGetMap";
 import './style.less';
+import {bindActionCreators} from "redux";
+import * as wellBoxActionsFromOtherFile from "../../Actions/wellData";
+import {connect} from "react-redux";
 
 const {Header, Content, Footer} = Layout;
 const FormItem = Form.Item;
@@ -16,7 +19,8 @@ class SearchDataPage extends React.Component{
             searchType: 'select',
             searchData: [],
             mapList: [],
-            listVisible: false
+            listVisible: false,
+            wellBoxMessage: null
         }
     }
     onRef(ref){
@@ -28,12 +32,17 @@ class SearchDataPage extends React.Component{
             const form = this.props.form;
             form.validateFields((err, values) => {
                 if (!err) {
-                    let result = getRocksByCondition({
-                        search: values.search
+                    let result = fetchGetTouchMaps({
+                        address: values.search,
+                        id: null
                     });
                     result.then(res=>{
                         return  res.json()
                     }).then(res=>{
+                            const {reduxSetWellData} = this.props.wellBoxAction;
+                            reduxSetWellData({
+                                wellBoxMessage: res.data
+                            });
                             this.child.showDrawer()
                         }
                     );
@@ -106,5 +115,19 @@ class SearchDataPage extends React.Component{
     }
 }
 
+// 链接redux
+function mapStateToProps(state) {
+    return {
+        wellData: state.wellData
+    }
+}
+function mapDispatchToProps(dispatch) {
+    return {
+        wellBoxAction: bindActionCreators(wellBoxActionsFromOtherFile, dispatch)
+    }
+}
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Form.create()(SearchDataPage))
 
-export  default Form.create()(SearchDataPage)

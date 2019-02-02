@@ -16,6 +16,8 @@ export default function post( ...args ) {
     formData.append('pal_fea', body.pal_fea);
     formData.append('lit_fea', body.lit_fea);
     formData.append('por_fea', body.por_fea);
+    formData.append('multiple', body.multiple);
+    formData.append('color', body.color);
     var result = null ;
     result = fetch(url, {
         method: 'PATCH',

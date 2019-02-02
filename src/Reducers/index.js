@@ -1,11 +1,14 @@
 import { combineReducers } from 'redux';
 
-import mapData from './mapData';
-
+import wellData from './wellData';
+import {regionData, poltypeData, lithosData} from './chooseMessage'
 
 const rootReducer = combineReducers({
-    mapData  // dispatch
-    // store
+    wellData,
+    //用户选择的数据
+    regionData,
+    poltypeData,
+    lithosData
 });
 
 export default rootReducer;

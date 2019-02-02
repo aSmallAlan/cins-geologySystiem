@@ -1,6 +1,9 @@
 import React from 'react'
 import {Modal} from 'antd'
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import {fetchGetTouchMaps, fetchGetInitialMaps} from "../../../Fetch/fetchGetMap";
+import * as wellBoxActionsFromOtherFile from '../../../Actions/wellData.js';
 import WellChooseBox from '../../../Components/WellChooseTable'
 // 引入 ECharts 主模块
 import echarts from '../../../../node_modules/echarts/lib/echarts';
@@ -12,7 +15,6 @@ import '../../../../node_modules/echarts/dist/extension/bmap'
 // 引入提示框和标题组件
 import '../../../../node_modules/echarts/lib/component/tooltip';
 import '../../../../node_modules/echarts/lib/component/title';
-import {getInitialMaps} from "../../../Fetch/fetchGetMap";
 
 
 class MapChooseChart extends React.Component{
@@ -44,21 +46,13 @@ class MapChooseChart extends React.Component{
         this.props.onRef(this)
         //获取地图显示的初始值
         let _this = this;
-        let mapList = getInitialMaps();
+        let mapList = fetchGetInitialMaps();
         mapList.then(res=>{
             return  res.json()
         }).then(res=> {
-            let data = [
-                {name: '武汉', value: 273},
-                {name: '大庆', value: 279},
-                {name: '成都', value: 300}
-            ];
+            let data = res.data;
 
-            let geoCoordMap = {
-                '武汉':[114.31,30.52],
-                '大庆':[125.03,46.58],
-                '成都': [104.06, 30.67]
-            };
+            let geoCoordMap = res.geocoordmap;
 
             let convertData = function (data) {
                 let res = [];
@@ -66,6 +60,7 @@ class MapChooseChart extends React.Component{
                     let geoCoord = geoCoordMap[data[i].name];
                     if (geoCoord) {
                         res.push({
+                            id: data[i].id,
                             name: data[i].name,
                             value: geoCoord.concat(data[i].value)
                         });
@@ -267,10 +262,24 @@ class MapChooseChart extends React.Component{
                 console.log("")
             }
             myChart.on('click', function(params){
-                _this.showDrawer();
+                let result = fetchGetTouchMaps({
+                    id: params.data.id,
+                    address: null
+                });
+                result.then(res=>{
+                    return  res.json()
+                }).then(res=> {
+                    _this.showDrawer();
+                    //将信息存入redux
+                    const {reduxSetWellData} = _this.props.wellBoxAction
+                    reduxSetWellData({
+                       wellBoxMessage:  res.data
+                    });
+                    console.log(res)
+                });
             });
             }
-        );
+        ).catch(error => console.error('Error:', error));
 
     }
     render(){
@@ -290,6 +299,19 @@ class MapChooseChart extends React.Component{
         )
     }
 }
-
-export default MapChooseChart
+// 链接redux
+function mapStateToProps(state) {
+    return {
+        wellData: state.wellData
+    }
+}
+function mapDispatchToProps(dispatch) {
+    return {
+        wellBoxAction: bindActionCreators(wellBoxActionsFromOtherFile, dispatch)
+    }
+}
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MapChooseChart)
 

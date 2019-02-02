@@ -2,6 +2,7 @@ import React from 'react'
 import {Table} from 'antd'
 import {withRouter} from "react-router-dom";
 import './style.less'
+import {connect} from "react-redux";
 
 class WellChooseBox extends React.Component{
     constructor(props){
@@ -10,52 +11,52 @@ class WellChooseBox extends React.Component{
 
     render(){
         const columns = [
-            { title: '序号', width: 100, dataIndex: 'name', key: 'name', fixed: 'left' },
-            { title: '井号', width: 100, dataIndex: 'age', key: 'age', fixed: 'left' },
-            { title: '井别', dataIndex: 'address', key: '1' },
-            { title: '井型', dataIndex: 'address', key: '2' },
-            { title: '备注', dataIndex: 'address', key: '3' },
-            { title: '经度', dataIndex: 'address', key: '4' },
-            { title: '纬度', dataIndex: 'address', key: '5' },
-            { title: '地面海拔', dataIndex: 'address', key: '6' },
-            { title: '目的层', dataIndex: 'address', key: '7' },
-            { title: '钻探层位', dataIndex: 'address', key: '8' },
+            { title: '地区', width: 100, dataIndex: 'region', fixed: 'left'},
+            { title: '井号', width: 100, dataIndex: 'name', fixed: 'left',},
+            { title: '钻井深度', dataIndex: 'dep_dri', key:'1' },
+            { title: '井别', dataIndex: 'well_class1', key:'2' },
+            { title: '井型', dataIndex: 'well_class2', key:'3' },
+            { title: '备注', dataIndex: 'note', key:'4' },
+            { title: '经度', dataIndex: 'lon', key:'5' },
+            { title: '纬度', dataIndex: 'lat', key:'6' },
+            { title: '目的层', dataIndex: 'tar_layer', key:'7'},
+            { title: '钻探层位', dataIndex: 'dri_layer', key:'8' },
+            { title: '完钻深度', dataIndex: 'dep_dri', key:'9' },
+            { title: '是否取心', dataIndex: 'core', key:'10', render: (text) => {
+                if (text == false){
+                    return (<div>否</div>)
+                }else {
+                    return (<div>是</div>)
+                }
+            }},
+            { title: '取心层位', dataIndex: 'core_layer', key:'11' },
+            { title: '取心段', dataIndex: 'core_sec' , key:'12'},
             {
-                title: '操作',
-                key: 'operation',
+                title: '选择该井',
+                dataIndex: 'id',
                 fixed: 'right',
                 width: 100,
-                render: () => <a onClick={()=>{this.props.history.push("/sliceList/12")}}>确定</a>,
+                render: (id) => {
+                    return (<a onClick={()=>{this.props.history.push("/sliceList/" + id)}}>确定</a>)
+                }
             },
         ];
-
-        const data = [{
-            key: '1',
-            name: '1',
-            age: 32,
-            address: '宁210井',
-        }, {
-            key: '2',
-            name: 2,
-            age: 40,
-            address: '宁210井',
-        },{
-            key: '3',
-            name: '3',
-            age: 32,
-            address: '宁210井',
-        },{
-            key: '4',
-            name: '4',
-            age: 32,
-            address: '宁210井',
-        }];
+        const data = this.props.wellData.wellBoxMessage;
         return (
             <div id='wellChooseTable'>
-                <Table columns={columns} dataSource={data} scroll={{ x: 1300 }} />;
+                <Table columns={columns} dataSource={data} scroll={{ x: 1300 }} />
             </div>
         )
     }
 }
+// 链接redux
+function mapStateToProps(state) {
+    return {
+        wellData: state.wellData
+    }
+}
 
-export default withRouter(WellChooseBox)
+export default connect(
+    mapStateToProps
+)(withRouter(WellChooseBox))
+

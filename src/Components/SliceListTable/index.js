@@ -1,27 +1,51 @@
 import React from 'react'
-import {Table, Divider} from 'antd'
+import {Table, Divider, Popconfirm, message} from 'antd'
 import SliceDetailBox from '../SliceDetailBox'
 import UpdateButton from '../ManageRockButton'
 import {withRouter} from "react-router-dom";
+import {fetchDeleteRocks} from "../../Fetch/fetchSearchData";
 
 class SliceListTable extends React.Component{
     constructor(props){
         super(props);
+        this.state = {
+            polData: [],
+            litData: [],
+            regionData: []
+        }
+    }
+
+    //确认删除
+    confirm(id){
+        let result = fetchDeleteRocks({
+            id: id
+        });
+        result.then(res=>{
+            return  res.json()
+        }).then(res=>{
+                if (res.code === 0){
+                    this.props.update(this.props.currentPage);
+                    message.info(res.msg)
+                } else{
+                    message.error(res.msg)
+                }
+                console.log(res)
+            }
+        );
     }
 
     render(){
         const columns = [{
             title: '深度',
-            dataIndex: 'name',
+            dataIndex: 'depth',
             render: text => <a href="javascript:;">{text}</a>,
-            sorter: (a, b) => a.name.length - b.name.length,
         }, {
             title: '年代底层单位',
-            className: 'column-money',
-            dataIndex: 'money',
+            className: 'area_detail',
+            dataIndex: 'area_detail',
         }, {
             title: '偏光类型',
-            dataIndex: 'address',
+            dataIndex: 'pol_type',
             filters: [{
                 text: '正交偏光',
                 value: '正交',
@@ -29,89 +53,60 @@ class SliceListTable extends React.Component{
                 text: '单偏光',
                 value: '单偏光',
             }],
-            onFilter: (value, record) => record.address.indexOf(value) === 0,
+            onFilter: (value, record) => record.pol_type.indexOf(value) === 0,
             sortDirections: ['descend'],
         },{
             title: '岩性',
-            dataIndex: 'a',
+            dataIndex: 'lit_des',
             filters: [{
-                text: '火山岩',
-                value: '火山岩',
+                text: '火成岩',
+                value: '火成岩',
             }, {
                 text: '沉积岩',
                 value: '沉积岩',
             }],
-            onFilter: (value, record) => record.a.indexOf(value) === 0,
+            onFilter: (value, record) => record.lit_des.indexOf(value) === 0,
             sortDirections: ['descend'],
         },{
             title: '操作',
             dataIndex: 'operate',
-            render: () => (
-                <div>
-                    <SliceDetailBox />
-                    <Divider type="vertical" />
-                    <UpdateButton />
-                    <Divider type="vertical" />
-                    <a href="javascript:;" onClick={()=>{this.props.history.push('/analyze')}}>分析</a>
-                </div>
-            ),
+            width: 200,
+            render: (record, text) => {
+                return (
+                    <div>
+                        <SliceDetailBox
+                            message={text.detail}
+                        />
+                        <Divider type="vertical" />
+                        <UpdateButton
+                            message={text}
+                            //继承父元素更新功能
+                            update={this.props.update}
+                            currentPage={this.props.currentPage}
+                        />
+                        <Divider type="vertical" />
+                        <a href="javascript:;" onClick={()=>{this.props.history.push('/analyze')}}>分析</a>
+                        <Divider type="vertical" />
+                        <Popconfirm
+                            title="确认删除该薄片？"
+                            onConfirm={()=>{this.confirm(text.detail.id)}}
+                            okText="是"
+                            cancelText="否"
+                        >
+                            <a href="#">删除</a>
+                        </Popconfirm>,
+                    </div>
+            )}
         }];
 
-        const data = [{
-            key: '1',
-            name: '111',
-            money: '123',
-            address: '正交偏光',
-            a: '火山岩'
-        }, {
-            key: '2',
-            name: '112311',
-            money: '123',
-            address: '正交偏光',
-            a: '火山岩'
-        }, {
-            key: '3',
-            name: '11141',
-            money: '123',
-            address: '单偏光',
-            a: '火山岩'
-        },{
-            key: '4',
-            name: '11',
-            money: '123',
-            address: '单偏光',
-            a: '火山岩'
-        },{
-            key: '5',
-            name: '1111',
-            money: '123',
-            address: '正交偏光',
-            a: '火山岩'
-        },{
-            key: '6',
-            name: '1111',
-            money: '123',
-            address: '单偏光',
-            a: '火山岩'
-        },{
-            key: '7',
-            name: '1111',
-            money: '123',
-            address: '正交偏光',
-            a: '火山岩'
-        },{
-            key: '8',
-            name: '1111',
-            money: '123',
-            address: '正交偏光',
-            a: '火山岩'
-        },{
-            key: '9',
-            name: '1111',
-            money: '123',
-            address: '正交偏光',
-            a: '沉积岩'
-        }];
+        const data = this.props.data;
+        let title = null;
+        try{
+            title = this.props.data[0].well_name
+        }catch (e) {
+
+        }
+
         return(
             <div id="sliceListTable">
                 <Table
@@ -119,10 +114,13 @@ class SliceListTable extends React.Component{
                     size="middle"
                     dataSource={data}
                     bordered
-                    title={() => '12号井'}
+                    pagination={false}
+                    title={() => title}
                 />
             </div>
         )
     }
 }
-export default withRouter(SliceListTable)
+export default withRouter(SliceListTable);
+
+
